@@ -6,6 +6,7 @@ import ContentProfile from './Component/ContentProfile/ContentProfile';
 import FollowerPage from '../../components/FollowerPage/FollowerPage';
 import ContentPosting from './Component/ContentPosting/ContentPosting';
 import ProfileModify from './Component/ProfileModify/ProfileModify';
+import fetchApi from '../../utils/functions';
 
 const Mypage = () => {
   const [myData, setMyData] = useState([]);
@@ -20,18 +21,10 @@ const Mypage = () => {
 
   // 내 정보 가져오기
   const myDataFetch = async () => {
-    const url = `${API_ADDRESS}/users`;
-
     try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: localStorage.getItem('resToken'),
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-      });
-      const json = await response.json();
-      setMyData(json);
+      await fetchApi(`/users`, setMyData);
+    } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
