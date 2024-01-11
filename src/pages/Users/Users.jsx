@@ -82,7 +82,7 @@ const Users = () => {
     ),
   };
 
-  if (loading) return <div>로딩중...</div>;
+  if (loading) return <div>로딩중입니다</div>;
 
   return (
     <Container userCategory={userCategory}>
