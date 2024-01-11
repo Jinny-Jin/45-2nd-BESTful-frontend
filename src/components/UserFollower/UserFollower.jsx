@@ -6,7 +6,7 @@ const UserFollower = ({
   userFollower,
   myId,
   setUserCategory,
-  iFollowing,
+  myFollowingUser,
   myFollowingUserFetch,
   followerOrFollowing,
 }) => {
@@ -31,7 +31,7 @@ const UserFollower = ({
               key={follower.id}
               follower={follower}
               myId={myId}
-              iFollowing={iFollowing}
+              myFollowingUser={myFollowingUser}
               myFollowingUserFetch={myFollowingUserFetch}
             />
           ))}

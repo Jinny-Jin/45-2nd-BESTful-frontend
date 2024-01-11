@@ -1,39 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ProfileImage from '../../../../components/ProfileImage/ProfileImage';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
 import FollowingButton from '../../../../components/followingButton/FollowingButton';
+import fetchApi from '../../../../utils/functions';
 
 const UserProfile = ({
   user,
   userFollower,
   userFollowing,
-  iFollowing,
+  myFollowingUser,
   myFollowingUserFetch,
   setFollowerOrFollowing,
   setUserCategory,
 }) => {
   const [followState, setFollowState] = useState(false);
-  const userImage = user?.profileImageUrl;
+  const { profileImageUrl, id, userName, bio } = user;
 
   const handleFollowerOrFollowing = x => {
     setUserCategory(1);
     setFollowerOrFollowing(x);
   };
 
-  const followUser = () => {
-    const url = `${API_ADDRESS}/follower`;
-
-    fetch(url, {
+  const followUser = async () => {
+    await fetchApi(`/follower`, {
       method: `${followState ? 'DELETE' : 'POST'}`,
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-        'Content-Type': 'application/json;charset=utf-8',
-      },
       body: JSON.stringify({
-        followedId: user.id,
+        followedId: id,
       }),
     });
+
     myFollowingUserFetch();
   };
 
@@ -43,19 +38,19 @@ const UserProfile = ({
   };
 
   useEffect(() => {
-    for (let i = 0; i < iFollowing.length; i++) {
-      if (iFollowing[i].id === user.id) {
+    for (let i = 0; i < myFollowingUser.length; i++) {
+      if (myFollowingUser[i].id === id) {
         setFollowState(true);
       }
     }
-  }, [iFollowing]);
+  }, [myFollowingUser]);
 
   return (
     <Container>
-      <ProfileImage src={userImage} alt="프로필 이미지" width={100} />
+      <ProfileImage src={profileImageUrl} width={100} />
       <ProfileBox>
-        <NickName>{user?.userName}</NickName>
-        <ButtonBox>
+        <NickName>{userName}</NickName>
+        <li>
           <FollowButton
             onClick={() => {
               handleFollowerOrFollowing(true);
@@ -72,12 +67,12 @@ const UserProfile = ({
             <FollowNumber>{userFollowing.length}</FollowNumber>
             following
           </FollowButton>
-        </ButtonBox>
+        </li>
         <FollowingButton
           handleBtn={handleFollowOrNot}
           followOrNot={followState}
         />
-        <Bio>{user?.bio}</Bio>
+        <Bio>{bio}</Bio>
       </ProfileBox>
     </Container>
   );
@@ -97,19 +92,18 @@ const Container = styled.div`
   background-color: #fff9f4;
 `;
 
-const ProfileBox = styled.div`
+const ProfileBox = styled.ul`
   display: flex;
   flex-direction: column;
   align-items: center;
   padding-top: 50px;
+  list-style-type: none;
 `;
 
-const NickName = styled.div`
+const NickName = styled.li`
   font-size: 21px;
   font-weight: bold;
 `;
-
-const ButtonBox = styled.div``;
 
 const FollowButton = styled.button`
   margin: 30px 30px;
@@ -123,12 +117,12 @@ const FollowButton = styled.button`
   }
 `;
 
-const FollowNumber = styled.div`
+const FollowNumber = styled.p`
   color: black;
   font-size: 21px;
 `;
 
-const Bio = styled.div`
+const Bio = styled.li`
   padding-top: 10%;
   width: 70%;
   font-size: 14px;

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { API_ADDRESS } from '../../utils/API_ADDRESS';
 import UserContentFeed from './Component/UserContentFeed/UserContentFeed';
 import UserFollower from '../../components/UserFollower/UserFollower';
 import UserProfile from './Component/UserProfile/UserProfile';
+import fetchApi from '../../utils/functions';
 
 const Users = () => {
   const [userData, setUserData] = useState([]);
@@ -19,109 +19,43 @@ const Users = () => {
 
   const params = useParams();
   const userId = params.id;
+  const myId = myData.id;
 
   const navigate = useNavigate();
 
-  const myId = myData.id;
-
   // 유저 데이터 받아오기
   const userDataFetch = async () => {
-    const url = `${API_ADDRESS}/users/${userId}`;
-
     try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          Authorization: localStorage.getItem('resToken'),
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-      });
-      const json = await response.json();
-      setUserData(json);
+      await fetchApi(`/users/${userId}`, setUserData);
+    } catch (error) {
+      console.log(error);
     } finally {
       setLoading(false);
     }
   };
 
   // 팔로워 데이터 받아오기
-  const userFollowerFetch = () => {
-    const url = `${API_ADDRESS}/follower/following/${userId}`;
-
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        setUserFollower(res);
-      });
-  };
+  const userFollowerFetch = () =>
+    fetchApi(`/follower/following/${userId}`, setUserFollower);
 
   // 팔로잉 데이터 받아오기
-  const userFollowingFetch = () => {
-    const url = `${API_ADDRESS}/follower/${userId}`;
-
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        setUserFollowing(res);
-      });
-  };
+  const userFollowingFetch = () =>
+    fetchApi(`/follower/${userId}`, setUserFollowing);
 
   // 내 정보 가져오기
-  const myDataFetch = () => {
-    fetch(`${API_ADDRESS}/users`, {
-      method: 'GET',
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        setMyData(res);
-      });
-  };
+  const myDataFetch = () => fetchApi(`/users`, setMyData);
 
   // 내가 팔로우하는 유저들 정보 가져오기
-  const myFollowingUserFetch = () => {
-    const url = `${API_ADDRESS}/follower/${myData.id}`;
-
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        setMyFollowingUser(res);
-      });
-  };
+  const myFollowingUserFetch = () =>
+    fetchApi(`/follower/${myData.id}`, setMyFollowingUser);
 
   // 유저 피드 정보 가져오기
-  const feedGet = () => {
-    const url = `${API_ADDRESS}/feeds/users/${userId}`;
+  const feedGet = async () => fetchApi(`/feeds/users/${userId}`, setFeed);
 
-    fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json;charset=utf-8' },
-    })
-      .then(res => res.json())
-      .then(feed => {
-        setFeed(feed);
-      });
-  };
+  useEffect(() => {
+    myDataFetch();
+    myFollowingUserFetch();
+  }, []);
 
   useEffect(() => {
     userDataFetch();
@@ -129,11 +63,6 @@ const Users = () => {
     userFollowingFetch();
     feedGet();
     setUserCategory(0);
-  }, [userId]);
-
-  useEffect(() => {
-    myDataFetch();
-    myFollowingUserFetch();
     if (parseInt(userId) === parseInt(myData.id)) {
       navigate('/mypage');
     }
@@ -145,7 +74,7 @@ const Users = () => {
       <UserFollower
         userFollower={followerOrFollowing ? userFollower : userFollowing}
         myId={myId}
-        iFollowing={myFollowingUser}
+        myFollowingUser={myFollowingUser}
         setUserCategory={setUserCategory}
         myFollowingUserFetch={myFollowingUserFetch}
         followerOrFollowing={followerOrFollowing}
@@ -153,7 +82,7 @@ const Users = () => {
     ),
   };
 
-  if (loading) return <div>로딩중...</div>;
+  if (loading) return <div>로딩중입니다</div>;
 
   return (
     <Container userCategory={userCategory}>
@@ -161,7 +90,7 @@ const Users = () => {
         user={userData}
         userFollower={userFollower}
         userFollowing={userFollowing}
-        iFollowing={myFollowingUser}
+        myFollowingUser={myFollowingUser}
         myFollowingUserFetch={myFollowingUserFetch}
         setFollowerOrFollowing={setFollowerOrFollowing}
         setUserCategory={setUserCategory}

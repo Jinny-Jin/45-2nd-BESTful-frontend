@@ -3,17 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ProfileImage from '../../ProfileImage/ProfileImage';
 import FollowingButton from '../../followingButton/FollowingButton';
-import { API_ADDRESS } from '../../../utils/API_ADDRESS';
+import fetchApi from '../../../utils/functions';
 
 const UserFollowerList = ({
   follower,
-  iFollowing,
+  myFollowingUser,
   myId,
   myFollowingUserFetch,
 }) => {
   const [followOrNot, setFollowOrNot] = useState(false);
-  const [noButton, setNoButton] = useState(false);
-
+  const [hideButton, setHideButton] = useState(false);
   const { userName, profileImage, id } = follower;
 
   const navigate = useNavigate();
@@ -22,19 +21,14 @@ const UserFollowerList = ({
     navigate(`/users/${id}`);
   };
 
-  const followUser = () => {
-    const url = `${API_ADDRESS}/follower`;
-
-    fetch(url, {
+  const followUser = async () => {
+    await fetchApi(`/follower`, {
       method: `${followOrNot ? 'DELETE' : 'POST'}`,
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-        'Content-Type': 'application/json;charset=utf-8',
-      },
       body: JSON.stringify({
         followedId: id,
       }),
     });
+
     myFollowingUserFetch();
   };
 
@@ -45,17 +39,17 @@ const UserFollowerList = ({
 
   useEffect(() => {
     if (id === myId) {
-      setNoButton(true);
+      setHideButton(true);
     }
   }, []);
 
   useEffect(() => {
-    for (let i = 0; i < iFollowing?.length; i++) {
-      if (iFollowing[i].id === id) {
+    for (let i = 0; i < myFollowingUser?.length; i++) {
+      if (myFollowingUser[i].id === id) {
         setFollowOrNot(true);
       }
     }
-  }, [iFollowing]);
+  }, [myFollowingUser]);
 
   return (
     <Container>
@@ -67,7 +61,7 @@ const UserFollowerList = ({
         <ProfileImage src={profileImage} width={40} />
         <FollowerName>{userName}</FollowerName>
       </FollowerInfo>
-      {noButton ? (
+      {hideButton ? (
         ''
       ) : (
         <FollowingButton handleBtn={handleBtn} followOrNot={followOrNot} />
