@@ -1,24 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const MyPageCategory = ({
-  feedOrLike,
-  myPageCategory,
-  setMyPageCategory,
-  setFeedOrLike,
-}) => {
-  const handleFeedContent = x => {
-    setMyPageCategory(0);
-    setFeedOrLike(x);
-  };
-
+const MyPageCategory = ({ feedOrLike, myPageCategory, handleCategory }) => {
   return (
     <Navigation>
       <UL>
         <List>
           <Button
             onClick={() => {
-              handleFeedContent(true);
+              handleCategory(0, true, null);
             }}
           >
             <PostingButton
@@ -32,7 +22,7 @@ const MyPageCategory = ({
         <List>
           <Button
             onClick={() => {
-              handleFeedContent(false);
+              handleCategory(0, false, null);
             }}
           >
             <LikeButton feedOrLike={feedOrLike} myPageCategory={myPageCategory}>

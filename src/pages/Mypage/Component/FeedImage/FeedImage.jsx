@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
+import fetchApi from '../../../../utils/functions';
 
 const modalStyle = {
   position: 'absolute',
@@ -44,7 +44,7 @@ const cancelBtn = {
   },
 };
 
-const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
+const FeedImage = ({ image, feedOrLike, feedId }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -58,16 +58,7 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
   };
 
   const deleteFeed = () => {
-    const url = `${API_ADDRESS}/feeds/${feedId}`;
-
-    fetch(url, {
-      method: 'DELETE',
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-    });
-    feedGet();
+    fetchApi(`/feeds/${feedId}`, null, { method: 'DELETE' });
   };
 
   return (
@@ -84,7 +75,9 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
       )}
       <Modal open={isOpen}>
         <Box sx={modalStyle}>
-          <Typography sx={{ mt: 2 }}>징짜?</Typography>
+          <Typography sx={{ mt: 2 }}>
+            정말 게시물을 삭제하시겠습니까?
+          </Typography>
           <Stack direction="row" spacing={3}>
             <Button
               variant="contained"
@@ -92,7 +85,6 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
               onClick={() => {
                 deleteFeed();
                 handleModal(false);
-                window.location.reload();
               }}
             >
               삭제

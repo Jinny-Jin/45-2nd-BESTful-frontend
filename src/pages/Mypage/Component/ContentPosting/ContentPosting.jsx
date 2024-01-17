@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import FeedImage from '../FeedImage/FeedImage';
 import { useNavigate } from 'react-router-dom';
 
-const ContentPosting = ({ feedOrLike, feed, feedGet }) => {
+const ContentPosting = ({ feedOrLike, feed }) => {
   const navigate = useNavigate();
 
   return (
@@ -41,7 +41,6 @@ const ContentPosting = ({ feedOrLike, feed, feedGet }) => {
                 image={posting.contentUrls[minIndex].contentUrl}
                 feedOrLike={feedOrLike}
                 feedId={posting.feedId}
-                feedGet={feedGet}
               />
             );
           })}

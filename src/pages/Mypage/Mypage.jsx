@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import MyPageCategory from './Component/MyPageCategory/MyPageCategory';
-import { API_ADDRESS } from '../../utils/API_ADDRESS';
 import ContentProfile from './Component/ContentProfile/ContentProfile';
 import FollowerPage from '../../components/FollowerPage/FollowerPage';
 import ContentPosting from './Component/ContentPosting/ContentPosting';
@@ -19,6 +18,8 @@ const Mypage = () => {
   const [followerOrFollowing, setFollowerOrFollowing] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
+  const myId = myData?.id;
+
   // 내 정보 가져오기
   const myDataFetch = async () => {
     try {
@@ -32,100 +33,65 @@ const Mypage = () => {
 
   // 내 팔로워 가져오기
   const myFollowerFetch = () => {
-    const url = `${API_ADDRESS}/follower/following/${myData.id}`;
-
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        setMyFollowerData(res);
-      });
+    fetchApi(`/follower/following/${myId}`, setMyFollowerData);
   };
 
   // 내가 팔로우 한 유저 가져오기
   const myFollowingFetch = () => {
-    const url = `${API_ADDRESS}/follower/${myData.id}`;
-
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
-    })
-      .then(res => res.json())
-      .then(res => {
-        setMyFollowingData(res);
-      });
+    fetchApi(`/follower/${myId}`, setMyFollowingData);
   };
 
   // 내가 올린 피드 글 가져오기
   const feedGet = () => {
-    const url = `${API_ADDRESS}/feeds/users/${myData.id}`;
-
-    fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json;charset=utf-8' },
-    })
-      .then(res => res.json())
-      .then(feed => {
-        setFeed(feed);
-      });
+    fetchApi(`/feeds/users/${myId}`, setFeed);
   };
 
   // 내가 좋아요 누른 글 가져오기
   const likeGet = () => {
-    const url = `${API_ADDRESS}/feeds/likes/${myData.id}`;
+    fetchApi(`/feeds/likes/${myId}`, setLike);
+  };
 
-    fetch(url, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json;charset=utf-8' },
-    })
-      .then(res => res.json())
-      .then(like => {
-        setLike(like);
-      });
+  const handleCategory = (category = null, feed = null, follower = null) => {
+    if (category !== null) {
+      setMyPageCategory(category);
+    }
+    if (feed !== null) {
+      setFeedOrLike(feed);
+    }
+    if (follower !== null) {
+      setFollowerOrFollowing(follower);
+    }
   };
 
   useEffect(() => {
-    myDataFetch();
-    feedGet();
     likeGet();
+    myFollowerFetch();
   }, []);
 
   useEffect(() => {
-    if (!myData.id) return;
+    feedGet();
+  }, [feed]);
 
-    myFollowerFetch();
+  useEffect(() => {
+    myDataFetch();
     myFollowingFetch();
-  }, [myData.id]);
+  }, [myData, myFollowingData]);
 
   const myPageCategoryList = {
     0: (
-      <ContentPosting
-        feedOrLike={feedOrLike}
-        feed={feedOrLike ? feed : like}
-        feedGet={feedGet}
-      />
+      <ContentPosting feedOrLike={feedOrLike} feed={feedOrLike ? feed : like} />
     ),
     1: (
       <ProfileModify
-        profile={myData}
-        myDataFetch={myDataFetch}
-        setMyPageCategory={setMyPageCategory}
-        setFeedOrLike={setFeedOrLike}
+        myData={myData}
+        setMyData={setMyData}
+        handleCategory={handleCategory}
       />
     ),
     2: (
       <FollowerPage
         followerData={followerOrFollowing ? myFollowerData : myFollowingData}
-        followingData={followerOrFollowing ? myFollowingData : null}
-        followingFetch={myFollowingFetch}
+        usersIFollow={followerOrFollowing ? myFollowingData : null}
         followerOrFollowing={followerOrFollowing}
       />
     ),
@@ -138,17 +104,14 @@ const Mypage = () => {
       <MyPageCategory
         feedOrLike={feedOrLike}
         myPageCategory={myPageCategory}
-        setMyPageCategory={setMyPageCategory}
-        setFeedOrLike={setFeedOrLike}
+        handleCategory={handleCategory}
       />
       <Container>
         <ContentProfile
-          profile={myData}
-          followerData={myFollowerData}
-          followingData={myFollowingData}
-          myDataFetch={myDataFetch}
-          setMyPageCategory={setMyPageCategory}
-          setFollowerOrFollowing={setFollowerOrFollowing}
+          myData={myData}
+          followerNumber={myFollowerData.length}
+          followingNumber={myFollowingData.length}
+          handleCategory={handleCategory}
         />
         {myPageCategoryList[myPageCategory]}
       </Container>

@@ -2,47 +2,33 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ProfileImage from '../../ProfileImage/ProfileImage';
-import { API_ADDRESS } from '../../../utils/API_ADDRESS';
 import FollowingButton from '../../followingButton/FollowingButton';
+import fetchApi from '../../../utils/functions';
 
-const FollowerList = ({
-  follower,
-  followingData,
-  followingFetch,
-  followerOrFollowing,
-}) => {
+const FollowerList = ({ follower, usersIFollow, followerOrFollowing }) => {
   const [followOrNot, setFollowOrNot] = useState(false);
 
   const { userName, profileImage, id } = follower;
 
   const navigate = useNavigate();
 
-  const onClickFollowerUser = () => {
+  const moveToUserPage = () => {
     navigate(`/users/${id}`);
   };
 
   const followUser = () => {
-    const url = `${API_ADDRESS}/follower`;
-
-    fetch(url, {
+    fetchApi(`/follower`, null, {
       method: `${followOrNot ? 'DELETE' : 'POST'}`,
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-        'Content-Type': 'application/json;charset=utf-8',
-      },
       body: JSON.stringify({
         followedId: id,
       }),
-    }).catch(error => {
-      console.error(error); // Error handling
     });
-    followingFetch();
   };
 
   useEffect(() => {
     if (followerOrFollowing) {
-      for (let i = 0; i < followingData.length; i++) {
-        if (followingData[i].id === id) {
+      for (let i = 0; i < usersIFollow.length; i++) {
+        if (usersIFollow[i].id === id) {
           setFollowOrNot(true);
         }
       }
@@ -50,7 +36,7 @@ const FollowerList = ({
     if (!followerOrFollowing) {
       return;
     }
-  }, [followerOrFollowing, followingData]);
+  }, [followerOrFollowing, usersIFollow]);
   //날 팔로우 한 유저들을 내가 팔로우 했는지 여부 판단
 
   const handleBtn = () => {
@@ -60,7 +46,7 @@ const FollowerList = ({
 
   return (
     <Container>
-      <FollowerInfo onClick={onClickFollowerUser}>
+      <FollowerInfo onClick={moveToUserPage}>
         <ProfileImage src={profileImage} width={40} />
         <FollowerName>{userName}</FollowerName>
       </FollowerInfo>
@@ -68,8 +54,6 @@ const FollowerList = ({
     </Container>
   );
 };
-
-export default FollowerList;
 
 const Container = styled.div`
   display: flex;
@@ -88,3 +72,5 @@ const FollowerName = styled.div`
   margin-left: 10px;
   font-weight: bold;
 `;
+
+export default FollowerList;

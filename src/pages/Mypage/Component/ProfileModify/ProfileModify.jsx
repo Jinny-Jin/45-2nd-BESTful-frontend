@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
+import fetchApi from '../../../../utils/functions';
 
 const modalStyle = {
   position: 'absolute',
@@ -41,80 +41,43 @@ const cancelBtn = {
   },
 };
 
-const ProfileModify = ({
-  profile,
-  myDataFetch,
-  setMyPageCategory,
-  setFeedOrLike,
-}) => {
+const ProfileModify = ({ myData, setMyData, handleCategory }) => {
   const [textLength, setTextLength] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  const [myInfo, setMyInfo] = useState({
-    mySex: profile?.sex || 'null',
-    myPhoneNumber: profile?.cellphone || 'none',
-    nickname: profile?.userName || '닉네임을 입력해주세요',
-    myBio: null,
-  });
-
-  const { mySex, myPhoneNumber, nickname, myBio } = myInfo;
+  const { sex, cellphone, userName, bio, email } = myData;
 
   const handleModal = e => {
     setIsOpen(e);
   };
 
+  const handleInputChange = (key, e) => {
+    const { value } = e.target;
+
+    if (value !== null || value !== '') {
+      setMyData(prev => ({ ...prev, [key]: value }));
+    }
+  };
+
   const handleRadio = e => {
-    setMyInfo(prev => ({ ...prev, mySex: e }));
-  };
-
-  const handleCellphone = e => {
-    const { value } = e.target;
-
-    setMyInfo(prev => ({ ...prev, myPhoneNumber: value }));
-    if (value === null || value === '') {
-      setMyInfo(prev => ({
-        ...prev,
-        myPhoneNumber: profile?.cellphone || 'none',
-      }));
-    }
-  };
-
-  const handleName = e => {
-    const { value } = e.target;
-
-    setMyInfo(prev => ({ ...prev, nickname: value }));
-    if (value === '' || value === null) {
-      setMyInfo(prev => ({ ...prev, nickname: profile.userName }));
-    }
+    setMyData(prev => ({ ...prev, [sex]: e }));
   };
 
   const acceptNumber = e => {
     e.target.value = e.target.value.replace(/[^0-9]/g, '');
   };
 
-  const handleCancelBtn = () => {
-    setMyPageCategory(0);
-    setFeedOrLike(true);
-  };
-
-  const activateButton = myPhoneNumber !== null && mySex !== '';
+  const activateButton = cellphone !== null && sex !== '';
 
   const postProfile = () => {
-    const url = `${API_ADDRESS}/users/edit`;
-
-    fetch(url, {
+    fetchApi(`/users/edit`, null, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
       body: JSON.stringify({
-        userName: nickname,
-        cellphone: myPhoneNumber,
-        sex: mySex,
-        bio: myBio,
+        userName: userName,
+        cellphone: cellphone,
+        sex: sex,
+        bio: bio,
       }),
-    }).then(res => res.json());
-    myDataFetch();
+    });
   };
 
   return (
@@ -122,15 +85,15 @@ const ProfileModify = ({
       <ProfileForm>
         <ModifyBox>
           <div>이메일</div>
-          <span>{profile?.email}</span>
+          <span>{email}</span>
         </ModifyBox>
         <ModifyBox>
           <label for="userName">유저 네임</label>
           <ProfileInput
             type="text"
             id="userName"
-            placeholder={`${profile.userName}`}
-            onChange={handleName}
+            placeholder={userName ?? '닉네임을 입력해주세요'}
+            onChange={e => handleInputChange('userName', e)}
           />
         </ModifyBox>
         <ModifyBox>
@@ -138,8 +101,8 @@ const ProfileModify = ({
           <ProfileInput
             type="text"
             id="cellphone"
-            placeholder={myPhoneNumber}
-            onChange={handleCellphone}
+            placeholder={cellphone ?? 'none'}
+            onChange={e => handleInputChange('cellphone', e)}
             onInput={acceptNumber}
           />
         </ModifyBox>
@@ -149,30 +112,20 @@ const ProfileModify = ({
         <ModifyBox>
           <span>성별</span>
           <div>
-            <input
-              type="radio"
-              id="male"
-              name="gender"
-              checked={mySex === '1'}
-              onClick={() => handleRadio('1')}
-            />
-            <label for="male">남성</label>
-            <input
-              type="radio"
-              id="female"
-              name="gender"
-              checked={mySex === '2'}
-              onClick={() => handleRadio('2')}
-            />
-            <label for="female">여성</label>
-            <input
-              type="radio"
-              id="none"
-              name="gender"
-              checked={mySex === 'null'}
-              onClick={() => handleRadio('null')}
-            />
-            <label for="none">선택하지 않음</label>
+            {chooseGender.map(item => {
+              return (
+                <span key={item.id}>
+                  <input
+                    type="radio"
+                    id={item.id}
+                    name="gender"
+                    checked={sex === item.numb}
+                    onClick={() => handleRadio(item.numb)}
+                  />
+                  <label for={item.id}>{item.gender}</label>
+                </span>
+              );
+            })}
           </div>
         </ModifyBox>
         <Alert>* 필수 선택</Alert>
@@ -184,10 +137,8 @@ const ProfileModify = ({
               placeholder="상태 메세지를 입력하세요"
               maxLength="300"
               onChange={e => {
-                const { value } = e.target;
-
-                setTextLength(value.length);
-                setMyInfo(prev => ({ ...prev, myBio: value }));
+                setTextLength(e.target.value.length);
+                handleInputChange('bio', e);
               }}
             />
             <span>{textLength}/300</span>
@@ -217,10 +168,10 @@ const ProfileModify = ({
                 </Button>
                 <Button
                   variant="contained"
+                  sx={cancelBtn}
                   onClick={() => {
                     handleModal(false);
                   }}
-                  sx={cancelBtn}
                 >
                   아니오
                 </Button>
@@ -228,14 +179,24 @@ const ProfileModify = ({
             </Box>
           </Modal>
 
-          <CancelButton onClick={handleCancelBtn}>취소</CancelButton>
+          <CancelButton
+            onClick={() => {
+              handleCategory(0, true, null);
+            }}
+          >
+            취소
+          </CancelButton>
         </SubmitDiv>
       </ProfileForm>
     </Container>
   );
 };
 
-export default ProfileModify;
+const chooseGender = [
+  { gender: '남성', id: 'male', numb: '1' },
+  { gender: '여성', id: 'female', numb: '2' },
+  { gender: '선택하지 않음', id: 'none', numb: 'null' },
+];
 
 const Container = styled.div`
   display: flex;
@@ -334,3 +295,5 @@ const Alert = styled.div`
   font-size: 12px;
   color: ${props => props.theme.style.orange};
 `;
+
+export default ProfileModify;

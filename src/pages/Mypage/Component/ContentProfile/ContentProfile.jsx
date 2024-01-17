@@ -4,56 +4,41 @@ import styled from 'styled-components';
 import { faCamera as camera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ProfileImage from '../../../../components/ProfileImage/ProfileImage';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
+import fetchApi from '../../../../utils/functions';
 
 const ContentProfile = ({
-  profile,
-  followerData,
-  followingData,
-  myDataFetch,
-  setMyPageCategory,
-  setFollowerOrFollowing,
+  myData,
+  followerNumber,
+  followingNumber,
+  handleCategory,
 }) => {
-  const [profileImage, setProfileImage] = useState(profile?.profileImageUrl);
+  const [profileImage, setProfileImage] = useState(myData?.profileImageUrl);
+  const { userName, bio } = myData;
+
   const profileImageInput = useRef(null);
 
-  const handleFollowrFollowingComponent = x => {
-    setMyPageCategory(2);
-    setFollowerOrFollowing(x);
-  };
-
   const changeImage = image => {
-    const url = `${API_ADDRESS}/users/image`;
-
     let formData = new FormData();
-    formData.append('profileImage', image); // Append the file object, not the file name
+    formData.append('profileImage', image);
 
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-      },
-      body: formData,
-    })
-      .then(res => res.json())
-      .then(data => {
-        alert('프로필 이미지가 수정되었습니다');
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error(error); // Error handling
+    try {
+      fetchApi(`/users/image`, null, {
+        method: 'POST',
+        body: formData,
       });
 
-    myDataFetch();
+      alert('프로필 이미지가 수정되었습니다');
+    } catch (error) {
+      console.log('에러 발생', error);
+    }
   };
 
   const profileChange = e => {
-    if (e.target.files[0]) {
-      setProfileImage(e.target.files[0]);
-      changeImage(e.target.files[0]);
-    } else {
-      setProfileImage(profile?.profileImageUrl);
-      return;
+    const { files } = e.target;
+
+    if (files[0]) {
+      setProfileImage(files[0]);
+      changeImage(files[0]);
     }
     const reader = new FileReader();
     reader.onload = () => {
@@ -61,7 +46,7 @@ const ContentProfile = ({
         setProfileImage(reader.result);
       }
     };
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(files[0]);
   };
 
   return (
@@ -95,27 +80,33 @@ const ContentProfile = ({
         </CameraBox>
       </form>
       <ProfileBox>
-        <NickName>{profile?.userName}</NickName>
+        <NickName>{userName}</NickName>
         <ButtonBox>
           <FollowButton
             onClick={() => {
-              handleFollowrFollowingComponent(true);
+              handleCategory(2, null, true);
             }}
           >
-            <FollowNumber>{followerData.length}</FollowNumber>
+            <FollowNumber>{followerNumber}</FollowNumber>
             follower
           </FollowButton>
           <FollowButton
             onClick={() => {
-              handleFollowrFollowingComponent(false);
+              handleCategory(2, null, false);
             }}
           >
-            <FollowNumber>{followingData.length}</FollowNumber>
+            <FollowNumber>{followingNumber}</FollowNumber>
             following
           </FollowButton>
         </ButtonBox>
-        <ChangeProfile onClick={() => {}}>프로필 편집</ChangeProfile>
-        <Bio>{profile?.bio}</Bio>
+        <ChangeProfile
+          onClick={() => {
+            handleCategory(1, null, null);
+          }}
+        >
+          프로필 편집
+        </ChangeProfile>
+        <Bio>{bio}</Bio>
       </ProfileBox>
     </Container>
   );
