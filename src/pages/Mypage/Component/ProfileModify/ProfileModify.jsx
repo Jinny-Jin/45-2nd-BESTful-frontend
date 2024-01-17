@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
+import { fetchApi } from '../../../../utils/functions';
 
 const modalStyle = {
   position: 'absolute',
@@ -55,40 +55,22 @@ const ProfileModify = ({
     nickname: profile?.userName || '닉네임을 입력해주세요',
     myBio: null,
   });
-
   const { mySex, myPhoneNumber, nickname, myBio } = myInfo;
 
   const handleModal = e => {
     setIsOpen(e);
   };
 
+  const handleInputChange = (key, e) => {
+    const { value } = e.target;
+
+    if (value !== null || value !== '') {
+      setMyInfo(prev => ({ ...prev, [key]: value }));
+    }
+  };
+
   const handleRadio = e => {
     setMyInfo(prev => ({ ...prev, mySex: e }));
-  };
-
-  const handleCellphone = e => {
-    const { value } = e.target;
-
-    setMyInfo(prev => ({ ...prev, myPhoneNumber: value }));
-    if (value === null || value === '') {
-      setMyInfo(prev => ({
-        ...prev,
-        myPhoneNumber: profile?.cellphone || 'none',
-      }));
-    }
-  };
-
-  const handleName = e => {
-    const { value } = e.target;
-
-    setMyInfo(prev => ({ ...prev, nickname: value }));
-    if (value === '' || value === null) {
-      setMyInfo(prev => ({ ...prev, nickname: profile.userName }));
-    }
-  };
-
-  const acceptNumber = e => {
-    e.target.value = e.target.value.replace(/[^0-9]/g, '');
   };
 
   const handleCancelBtn = () => {
@@ -96,24 +78,22 @@ const ProfileModify = ({
     setFeedOrLike(true);
   };
 
+  const acceptNumber = e => {
+    e.target.value = e.target.value.replace(/[^0-9]/g, '');
+  };
+
   const activateButton = myPhoneNumber !== null && mySex !== '';
 
   const postProfile = () => {
-    const url = `${API_ADDRESS}/users/edit`;
-
-    fetch(url, {
+    fetchApi(`/users/edit`, null, {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-        Authorization: localStorage.getItem('resToken'),
-      },
       body: JSON.stringify({
         userName: nickname,
         cellphone: myPhoneNumber,
         sex: mySex,
         bio: myBio,
       }),
-    }).then(res => res.json());
+    });
     myDataFetch();
   };
 
@@ -129,8 +109,8 @@ const ProfileModify = ({
           <ProfileInput
             type="text"
             id="userName"
-            placeholder={`${profile.userName}`}
-            onChange={handleName}
+            placeholder={`${nickname}`}
+            onChange={e => handleInputChange('nickname', e)}
           />
         </ModifyBox>
         <ModifyBox>
@@ -139,7 +119,7 @@ const ProfileModify = ({
             type="text"
             id="cellphone"
             placeholder={myPhoneNumber}
-            onChange={handleCellphone}
+            onChange={e => handleInputChange('myPhoneNumber', e)}
             onInput={acceptNumber}
           />
         </ModifyBox>

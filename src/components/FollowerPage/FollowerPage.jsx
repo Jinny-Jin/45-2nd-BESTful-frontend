@@ -4,7 +4,7 @@ import FollowerList from './FollowerList/FollowerList';
 
 const FollowerPage = ({
   followerData,
-  followingData,
+  usersIFollow,
   followingFetch,
   followerOrFollowing,
 }) => {
@@ -24,7 +24,7 @@ const FollowerPage = ({
               <FollowerList
                 key={follower.id}
                 follower={follower}
-                followingData={followingData}
+                usersIFollow={usersIFollow}
                 followingFetch={followingFetch}
                 followerOrFollowing={followerOrFollowing}
               />

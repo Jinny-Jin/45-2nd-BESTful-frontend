@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { faCamera as camera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ProfileImage from '../../../../components/ProfileImage/ProfileImage';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
+import { fetchApi } from '../../../../utils/functions';
 
 const ContentProfile = ({
   profile,
@@ -23,26 +23,19 @@ const ContentProfile = ({
   };
 
   const changeImage = image => {
-    const url = `${API_ADDRESS}/users/image`;
-
     let formData = new FormData();
-    formData.append('profileImage', image); // Append the file object, not the file name
+    formData.append('profileImage', image);
 
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-      },
-      body: formData,
-    })
-      .then(res => res.json())
-      .then(data => {
-        alert('프로필 이미지가 수정되었습니다');
-        window.location.reload();
-      })
-      .catch(error => {
-        console.error(error); // Error handling
+    try {
+      fetchApi(`/users/image`, null, {
+        method: 'POST',
+        body: formData,
       });
+
+      alert('프로필 이미지가 수정되었습니다');
+    } catch (error) {
+      console.log('에러 발생', error);
+    }
 
     myDataFetch();
   };

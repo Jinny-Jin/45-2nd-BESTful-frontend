@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import { API_ADDRESS } from '../../../../utils/API_ADDRESS';
+import fetchApi from '../../../../utils/functions';
 
 const modalStyle = {
   position: 'absolute',
@@ -58,15 +58,7 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
   };
 
   const deleteFeed = () => {
-    const url = `${API_ADDRESS}/feeds/${feedId}`;
-
-    fetch(url, {
-      method: 'DELETE',
-      headers: {
-        Authorization: localStorage.getItem('resToken'),
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-    });
+    fetchApi(`/feeds/${feedId}`, null, { method: 'DELETE' });
     feedGet();
   };
 
@@ -92,7 +84,6 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
               onClick={() => {
                 deleteFeed();
                 handleModal(false);
-                window.location.reload();
               }}
             >
               삭제
