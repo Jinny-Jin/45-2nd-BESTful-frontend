@@ -18,7 +18,7 @@ const Mypage = () => {
   const [followerOrFollowing, setFollowerOrFollowing] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
-  const myId = myData.id;
+  const myId = myData?.id;
 
   // 내 정보 가져오기
   const myDataFetch = async () => {
@@ -51,40 +51,47 @@ const Mypage = () => {
     fetchApi(`/feeds/likes/${myId}`, setLike);
   };
 
+  const handleCategory = (category = null, feed = null, follower = null) => {
+    if (category !== null) {
+      setMyPageCategory(category);
+    }
+    if (feed !== null) {
+      setFeedOrLike(feed);
+    }
+    if (follower !== null) {
+      setFollowerOrFollowing(follower);
+    }
+  };
+
   useEffect(() => {
-    myDataFetch();
-    feedGet();
     likeGet();
+    myFollowerFetch();
   }, []);
 
   useEffect(() => {
-    if (!myId) return;
+    feedGet();
+  }, [feed]);
 
-    myFollowerFetch();
+  useEffect(() => {
+    myDataFetch();
     myFollowingFetch();
-  }, [myId]);
+  }, [myData, myFollowingData]);
 
   const myPageCategoryList = {
     0: (
-      <ContentPosting
-        feedOrLike={feedOrLike}
-        feed={feedOrLike ? feed : like}
-        feedGet={feedGet}
-      />
+      <ContentPosting feedOrLike={feedOrLike} feed={feedOrLike ? feed : like} />
     ),
     1: (
       <ProfileModify
-        profile={myData}
-        myDataFetch={myDataFetch}
-        setMyPageCategory={setMyPageCategory}
-        setFeedOrLike={setFeedOrLike}
+        myData={myData}
+        setMyData={setMyData}
+        handleCategory={handleCategory}
       />
     ),
     2: (
       <FollowerPage
         followerData={followerOrFollowing ? myFollowerData : myFollowingData}
         usersIFollow={followerOrFollowing ? myFollowingData : null}
-        followingFetch={myFollowingFetch}
         followerOrFollowing={followerOrFollowing}
       />
     ),
@@ -97,17 +104,14 @@ const Mypage = () => {
       <MyPageCategory
         feedOrLike={feedOrLike}
         myPageCategory={myPageCategory}
-        setMyPageCategory={setMyPageCategory}
-        setFeedOrLike={setFeedOrLike}
+        handleCategory={handleCategory}
       />
       <Container>
         <ContentProfile
-          profile={myData}
-          followerData={myFollowerData}
-          followingData={myFollowingData}
-          myDataFetch={myDataFetch}
-          setMyPageCategory={setMyPageCategory}
-          setFollowerOrFollowing={setFollowerOrFollowing}
+          myData={myData}
+          followerNumber={myFollowerData.length}
+          followingNumber={myFollowingData.length}
+          handleCategory={handleCategory}
         />
         {myPageCategoryList[myPageCategory]}
       </Container>

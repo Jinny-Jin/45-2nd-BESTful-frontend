@@ -4,23 +4,18 @@ import styled from 'styled-components';
 import { faCamera as camera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ProfileImage from '../../../../components/ProfileImage/ProfileImage';
-import { fetchApi } from '../../../../utils/functions';
+import fetchApi from '../../../../utils/functions';
 
 const ContentProfile = ({
-  profile,
-  followerData,
-  followingData,
-  myDataFetch,
-  setMyPageCategory,
-  setFollowerOrFollowing,
+  myData,
+  followerNumber,
+  followingNumber,
+  handleCategory,
 }) => {
-  const [profileImage, setProfileImage] = useState(profile?.profileImageUrl);
-  const profileImageInput = useRef(null);
+  const [profileImage, setProfileImage] = useState(myData?.profileImageUrl);
+  const { userName, bio } = myData;
 
-  const handleFollowrFollowingComponent = x => {
-    setMyPageCategory(2);
-    setFollowerOrFollowing(x);
-  };
+  const profileImageInput = useRef(null);
 
   const changeImage = image => {
     let formData = new FormData();
@@ -36,17 +31,14 @@ const ContentProfile = ({
     } catch (error) {
       console.log('에러 발생', error);
     }
-
-    myDataFetch();
   };
 
   const profileChange = e => {
-    if (e.target.files[0]) {
-      setProfileImage(e.target.files[0]);
-      changeImage(e.target.files[0]);
-    } else {
-      setProfileImage(profile?.profileImageUrl);
-      return;
+    const { files } = e.target;
+
+    if (files[0]) {
+      setProfileImage(files[0]);
+      changeImage(files[0]);
     }
     const reader = new FileReader();
     reader.onload = () => {
@@ -88,27 +80,33 @@ const ContentProfile = ({
         </CameraBox>
       </form>
       <ProfileBox>
-        <NickName>{profile?.userName}</NickName>
+        <NickName>{userName}</NickName>
         <ButtonBox>
           <FollowButton
             onClick={() => {
-              handleFollowrFollowingComponent(true);
+              handleCategory(2, null, true);
             }}
           >
-            <FollowNumber>{followerData.length}</FollowNumber>
+            <FollowNumber>{followerNumber}</FollowNumber>
             follower
           </FollowButton>
           <FollowButton
             onClick={() => {
-              handleFollowrFollowingComponent(false);
+              handleCategory(2, null, false);
             }}
           >
-            <FollowNumber>{followingData.length}</FollowNumber>
+            <FollowNumber>{followingNumber}</FollowNumber>
             following
           </FollowButton>
         </ButtonBox>
-        <ChangeProfile onClick={() => {}}>프로필 편집</ChangeProfile>
-        <Bio>{profile?.bio}</Bio>
+        <ChangeProfile
+          onClick={() => {
+            handleCategory(1, null, null);
+          }}
+        >
+          프로필 편집
+        </ChangeProfile>
+        <Bio>{bio}</Bio>
       </ProfileBox>
     </Container>
   );

@@ -44,7 +44,7 @@ const cancelBtn = {
   },
 };
 
-const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
+const FeedImage = ({ image, feedOrLike, feedId }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -59,7 +59,6 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
 
   const deleteFeed = () => {
     fetchApi(`/feeds/${feedId}`, null, { method: 'DELETE' });
-    feedGet();
   };
 
   return (
@@ -76,7 +75,9 @@ const FeedImage = ({ image, feedGet, feedOrLike, feedId }) => {
       )}
       <Modal open={isOpen}>
         <Box sx={modalStyle}>
-          <Typography sx={{ mt: 2 }}>징짜?</Typography>
+          <Typography sx={{ mt: 2 }}>
+            정말 게시물을 삭제하시겠습니까?
+          </Typography>
           <Stack direction="row" spacing={3}>
             <Button
               variant="contained"

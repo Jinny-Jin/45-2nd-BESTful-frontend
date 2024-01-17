@@ -1,6 +1,6 @@
 import { API_ADDRESS } from './API_ADDRESS';
 
-export const fetchApi = async (endpoint, setStateFunc = null, init = null) => {
+const fetchApi = async (endpoint, setStateFunc = null, init = null) => {
   try {
     const response = await fetch(`${API_ADDRESS}${endpoint}`, {
       ...init,
@@ -24,3 +24,5 @@ export const fetchApi = async (endpoint, setStateFunc = null, init = null) => {
     console.log(error);
   }
 };
+
+export default fetchApi;

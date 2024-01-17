@@ -3,21 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import ProfileImage from '../../ProfileImage/ProfileImage';
 import FollowingButton from '../../followingButton/FollowingButton';
-import { fetchApi } from '../../../utils/functions';
+import fetchApi from '../../../utils/functions';
 
-const FollowerList = ({
-  follower,
-  usersIFollow,
-  followingFetch,
-  followerOrFollowing,
-}) => {
+const FollowerList = ({ follower, usersIFollow, followerOrFollowing }) => {
   const [followOrNot, setFollowOrNot] = useState(false);
 
   const { userName, profileImage, id } = follower;
 
   const navigate = useNavigate();
 
-  const onClickFollowerUser = () => {
+  const moveToUserPage = () => {
     navigate(`/users/${id}`);
   };
 
@@ -28,7 +23,6 @@ const FollowerList = ({
         followedId: id,
       }),
     });
-    followingFetch();
   };
 
   useEffect(() => {
@@ -52,7 +46,7 @@ const FollowerList = ({
 
   return (
     <Container>
-      <FollowerInfo onClick={onClickFollowerUser}>
+      <FollowerInfo onClick={moveToUserPage}>
         <ProfileImage src={profileImage} width={40} />
         <FollowerName>{userName}</FollowerName>
       </FollowerInfo>
@@ -60,8 +54,6 @@ const FollowerList = ({
     </Container>
   );
 };
-
-export default FollowerList;
 
 const Container = styled.div`
   display: flex;
@@ -80,3 +72,5 @@ const FollowerName = styled.div`
   margin-left: 10px;
   font-weight: bold;
 `;
+
+export default FollowerList;
