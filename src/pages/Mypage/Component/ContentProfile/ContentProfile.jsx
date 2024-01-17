@@ -46,7 +46,7 @@ const ContentProfile = ({
         setProfileImage(reader.result);
       }
     };
-    reader.readAsDataURL(e.target.files[0]);
+    reader.readAsDataURL(files[0]);
   };
 
   return (
