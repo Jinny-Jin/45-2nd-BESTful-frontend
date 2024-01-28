@@ -6,6 +6,7 @@ import FollowerPage from '../../components/FollowerPage/FollowerPage';
 import ContentPosting from './Component/ContentPosting/ContentPosting';
 import ProfileModify from './Component/ProfileModify/ProfileModify';
 import fetchApi from '../../utils/functions';
+import { useSelector } from 'react-redux';
 
 const Mypage = () => {
   const [myData, setMyData] = useState([]);
@@ -13,11 +14,11 @@ const Mypage = () => {
   const [myFollowingData, setMyFollowingData] = useState([]);
   const [feed, setFeed] = useState([]);
   const [like, setLike] = useState([]);
-  const [myPageCategory, setMyPageCategory] = useState(0);
-  const [feedOrLike, setFeedOrLike] = useState(true);
-  const [followerOrFollowing, setFollowerOrFollowing] = useState(undefined);
   const [loading, setLoading] = useState(true);
 
+  const followOrFollowing = useSelector(state => state.followOrFollowing);
+  const myPageCategoryNumber = useSelector(state => state.myPageCategoryNumber);
+  const feedOrLike = useSelector(state => state.feedOrLike);
   const myId = myData?.id;
 
   // 내 정보 가져오기
@@ -51,18 +52,6 @@ const Mypage = () => {
     fetchApi(`/feeds/likes/${myId}`, setLike);
   };
 
-  const handleCategory = (category = null, feed = null, follower = null) => {
-    if (category !== null) {
-      setMyPageCategory(category);
-    }
-    if (feed !== null) {
-      setFeedOrLike(feed);
-    }
-    if (follower !== null) {
-      setFollowerOrFollowing(follower);
-    }
-  };
-
   useEffect(() => {
     likeGet();
     myFollowerFetch();
@@ -78,21 +67,14 @@ const Mypage = () => {
   }, [myData, myFollowingData]);
 
   const myPageCategoryList = {
-    0: (
-      <ContentPosting feedOrLike={feedOrLike} feed={feedOrLike ? feed : like} />
-    ),
-    1: (
-      <ProfileModify
-        myData={myData}
-        setMyData={setMyData}
-        handleCategory={handleCategory}
-      />
-    ),
+    0: <ContentPosting feed={feedOrLike === '피드' ? feed : like} />,
+    1: <ProfileModify myData={myData} setMyData={setMyData} />,
     2: (
       <FollowerPage
-        followerData={followerOrFollowing ? myFollowerData : myFollowingData}
-        usersIFollow={followerOrFollowing ? myFollowingData : null}
-        followerOrFollowing={followerOrFollowing}
+        followerData={
+          followOrFollowing === '팔로워' ? myFollowerData : myFollowingData
+        }
+        usersIFollow={followOrFollowing === '팔로워' ? myFollowingData : null}
       />
     ),
   };
@@ -101,19 +83,14 @@ const Mypage = () => {
 
   return (
     <TopContainer>
-      <MyPageCategory
-        feedOrLike={feedOrLike}
-        myPageCategory={myPageCategory}
-        handleCategory={handleCategory}
-      />
+      <MyPageCategory />
       <Container>
         <ContentProfile
           myData={myData}
           followerNumber={myFollowerData.length}
           followingNumber={myFollowingData.length}
-          handleCategory={handleCategory}
         />
-        {myPageCategoryList[myPageCategory]}
+        {myPageCategoryList[myPageCategoryNumber]}
       </Container>
     </TopContainer>
   );

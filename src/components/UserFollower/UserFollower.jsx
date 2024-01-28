@@ -1,27 +1,32 @@
 import React from 'react';
 import styled from 'styled-components';
 import UserFollowerList from './UserFollowerList/UserFollowerList';
+import { useDispatch, useSelector } from 'react-redux';
 
 const UserFollower = ({
   userFollower,
   myId,
-  setUserCategory,
   myFollowingUser,
   myFollowingUserFetch,
-  followerOrFollowing,
 }) => {
+  const dispatch = useDispatch();
+  const userFollowOrFollowing = useSelector(state => state.followOrFollowing);
+
   const backToFeed = () => {
-    setUserCategory(0);
+    dispatch({ type: 'CHOOSE_USER_CATEGORY', catNumb: 0 });
   };
 
   return (
     <TopContainer>
       <Back onClick={backToFeed}>&lt; Back</Back>
       <Container>
-        <Title>{followerOrFollowing ? '팔로워' : '팔로잉'}</Title>
+        <Title>{userFollowOrFollowing}</Title>
         {(userFollower === undefined || userFollower.length === 0) && (
           <None>
-            {followerOrFollowing ? '팔로워' : '팔로잉 유저'}가 없습니다
+            {userFollowOrFollowing === '팔로워'
+              ? '회원님을 팔로우하는 사람'
+              : '회원님이 팔로우하는사람'}
+            이 없습니다
           </None>
         )}
         {userFollower !== undefined &&

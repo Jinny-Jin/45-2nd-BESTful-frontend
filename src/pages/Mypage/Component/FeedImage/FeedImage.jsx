@@ -9,6 +9,7 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import fetchApi from '../../../../utils/functions';
+import { useSelector } from 'react-redux';
 
 const modalStyle = {
   position: 'absolute',
@@ -44,8 +45,9 @@ const cancelBtn = {
   },
 };
 
-const FeedImage = ({ image, feedOrLike, feedId }) => {
+const FeedImage = ({ image, feedId }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const feedOrLike = useSelector(state => state.feedOrLike);
 
   const navigate = useNavigate();
 
@@ -64,7 +66,7 @@ const FeedImage = ({ image, feedOrLike, feedId }) => {
   return (
     <Container>
       <Image src={`${image}`} alt="feedImage" onClick={handleNavigate} />
-      {feedOrLike ? (
+      {feedOrLike === '피드' ? (
         <Trash>
           <Button onClick={() => handleModal(true)}>
             <FontAwesomeIcon icon={trash} size="xl" color="#fe4600" />

@@ -5,6 +5,7 @@ import UserContentFeed from './Component/UserContentFeed/UserContentFeed';
 import UserFollower from '../../components/UserFollower/UserFollower';
 import UserProfile from './Component/UserProfile/UserProfile';
 import fetchApi from '../../utils/functions';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Users = () => {
   const [userData, setUserData] = useState([]);
@@ -14,9 +15,10 @@ const Users = () => {
   const [myFollowingUser, setMyFollowingUser] = useState([]);
   const [feed, setFeed] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [userCategory, setUserCategory] = useState(0);
-  const [followerOrFollowing, setFollowerOrFollowing] = useState(undefined);
 
+  const dispatch = useDispatch();
+  const userFollowOrFollowing = useSelector(state => state.followOrFollowing);
+  const userCategoryNumber = useSelector(state => state.userCategoryNumber);
   const params = useParams();
   const userId = params.id;
   const myId = myData.id;
@@ -62,7 +64,8 @@ const Users = () => {
     userFollowerFetch();
     userFollowingFetch();
     feedGet();
-    setUserCategory(0);
+
+    dispatch({ type: 'CHOOSE_USER_CATEGORY', catNumb: 0 });
     if (parseInt(userId) === parseInt(myData.id)) {
       navigate('/mypage');
     }
@@ -72,12 +75,12 @@ const Users = () => {
     0: <UserContentFeed feed={feed} />,
     1: (
       <UserFollower
-        userFollower={followerOrFollowing ? userFollower : userFollowing}
+        userFollower={
+          userFollowOrFollowing === '팔로워' ? userFollower : userFollowing
+        }
         myId={myId}
         myFollowingUser={myFollowingUser}
-        setUserCategory={setUserCategory}
         myFollowingUserFetch={myFollowingUserFetch}
-        followerOrFollowing={followerOrFollowing}
       />
     ),
   };
@@ -85,17 +88,15 @@ const Users = () => {
   if (loading) return <div>로딩중입니다</div>;
 
   return (
-    <Container userCategory={userCategory}>
+    <Container>
       <UserProfile
         user={userData}
         userFollower={userFollower}
         userFollowing={userFollowing}
         myFollowingUser={myFollowingUser}
         myFollowingUserFetch={myFollowingUserFetch}
-        setFollowerOrFollowing={setFollowerOrFollowing}
-        setUserCategory={setUserCategory}
       />
-      {categoryList[userCategory]}
+      {categoryList[userCategoryNumber]}
     </Container>
   );
 };

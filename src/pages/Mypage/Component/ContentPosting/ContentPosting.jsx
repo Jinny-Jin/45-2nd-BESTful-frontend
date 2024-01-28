@@ -2,16 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 import FeedImage from '../FeedImage/FeedImage';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-const ContentPosting = ({ feedOrLike, feed }) => {
+const ContentPosting = ({ feed }) => {
   const navigate = useNavigate();
+  const feedOrLike = useSelector(state => state.feedOrLike);
 
   return (
     <Container>
       <Posting>
         {(feed === undefined || feed.length === 0) && (
           <PostingNone>
-            {feedOrLike ? (
+            {feedOrLike === '피드' ? (
               <span
                 className="firstPost"
                 onClick={() => navigate('/post-upload')}
@@ -39,7 +41,6 @@ const ContentPosting = ({ feedOrLike, feed }) => {
               <FeedImage
                 key={posting.feedId}
                 image={posting.contentUrls[minIndex].contentUrl}
-                feedOrLike={feedOrLike}
                 feedId={posting.feedId}
               />
             );

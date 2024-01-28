@@ -1,14 +1,23 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-const MyPageCategory = ({ feedOrLike, myPageCategory, handleCategory }) => {
+const MyPageCategory = () => {
+  const dispatch = useDispatch();
+  const myPageCategory = useSelector(state => state.myPageCategoryNumber);
+  const feedOrLike = useSelector(state => state.feedOrLike);
+
   return (
     <Navigation>
       <UL>
         <List>
           <Button
             onClick={() => {
-              handleCategory(0, true, null);
+              dispatch({
+                type: 'CHOOSE_MYPAGE_CATEGORY',
+                myCatNumb: 0,
+                feedOrLike: '피드',
+              });
             }}
           >
             <PostingButton
@@ -22,7 +31,11 @@ const MyPageCategory = ({ feedOrLike, myPageCategory, handleCategory }) => {
         <List>
           <Button
             onClick={() => {
-              handleCategory(0, false, null);
+              dispatch({
+                type: 'CHOOSE_MYPAGE_CATEGORY',
+                myCatNumb: 0,
+                feedOrLike: '좋아요',
+              });
             }}
           >
             <LikeButton feedOrLike={feedOrLike} myPageCategory={myPageCategory}>
@@ -67,14 +80,14 @@ const Button = styled.button`
 
 const PostingButton = styled.div`
   color: ${props =>
-    props.myPageCategory === 0 && props.feedOrLike
+    props.myPageCategory === 0 && props.feedOrLike === '피드'
       ? props.theme.style.orange
       : 'black'};
 `;
 
 const LikeButton = styled.div`
   color: ${props =>
-    props.myPageCategory === 0 && props.feedOrLike !== true
+    props.myPageCategory === 0 && props.feedOrLike === '좋아요'
       ? props.theme.style.orange
       : 'black'};
 `;
