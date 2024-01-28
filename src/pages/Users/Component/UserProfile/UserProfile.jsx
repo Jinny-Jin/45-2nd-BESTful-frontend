@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import ProfileImage from '../../../../components/ProfileImage/ProfileImage';
 import FollowingButton from '../../../../components/followingButton/FollowingButton';
 import fetchApi from '../../../../utils/functions';
+import { useDispatch } from 'react-redux';
 
 const UserProfile = ({
   user,
@@ -10,15 +11,14 @@ const UserProfile = ({
   userFollowing,
   myFollowingUser,
   myFollowingUserFetch,
-  setFollowerOrFollowing,
-  setUserCategory,
 }) => {
   const [followState, setFollowState] = useState(false);
   const { profileImageUrl, id, userName, bio } = user;
+  const dispatch = useDispatch();
 
   const handleFollowerOrFollowing = x => {
-    setUserCategory(1);
-    setFollowerOrFollowing(x);
+    dispatch({ type: 'CHOOSE_USER_CATEGORY', catNumb: 1 });
+    dispatch({ type: 'SWITCH', userFollowOrFollowing: x });
   };
 
   const followUser = async () => {
@@ -53,7 +53,7 @@ const UserProfile = ({
         <li>
           <FollowButton
             onClick={() => {
-              handleFollowerOrFollowing(true);
+              handleFollowerOrFollowing('팔로워');
             }}
           >
             <FollowNumber>{userFollower.length}</FollowNumber>
@@ -61,7 +61,7 @@ const UserProfile = ({
           </FollowButton>
           <FollowButton
             onClick={() => {
-              handleFollowerOrFollowing(false);
+              handleFollowerOrFollowing('팔로잉');
             }}
           >
             <FollowNumber>{userFollowing.length}</FollowNumber>

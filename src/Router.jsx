@@ -12,6 +12,8 @@ import InvalidAccess from './pages/Contents/InvalidAccess';
 import InfiniteFollowing from './pages/Following/InfiniteFollowing';
 import InfiniteMain from './pages/Main/InfiniteMain';
 import InfiniteBest from './pages/Best/InfiniteBest';
+import { Provider } from 'react-redux';
+import store from './store';
 
 const Router = () => {
   const location = useLocation();
@@ -23,7 +25,7 @@ const Router = () => {
   };
 
   return (
-    <>
+    <Provider store={store}>
       {renderNav()}
       <Routes>
         <Route path="/login" element={<Login />} />
@@ -39,7 +41,7 @@ const Router = () => {
         <Route path="/" element={<InfiniteMain />} />
         <Route path="/following" element={<InfiniteFollowing />} />
       </Routes>
-    </>
+    </Provider>
   );
 };
 

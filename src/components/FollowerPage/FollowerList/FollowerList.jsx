@@ -4,11 +4,12 @@ import styled from 'styled-components';
 import ProfileImage from '../../ProfileImage/ProfileImage';
 import FollowingButton from '../../followingButton/FollowingButton';
 import fetchApi from '../../../utils/functions';
+import { useSelector } from 'react-redux';
 
-const FollowerList = ({ follower, usersIFollow, followerOrFollowing }) => {
+const FollowerList = ({ follower, usersIFollow }) => {
   const [followOrNot, setFollowOrNot] = useState(false);
-
   const { userName, profileImage, id } = follower;
+  const followOrFollowing = useSelector(state => state.followOrFollowing);
 
   const navigate = useNavigate();
 
@@ -26,17 +27,17 @@ const FollowerList = ({ follower, usersIFollow, followerOrFollowing }) => {
   };
 
   useEffect(() => {
-    if (followerOrFollowing) {
+    if (followOrFollowing === '팔로워') {
       for (let i = 0; i < usersIFollow.length; i++) {
         if (usersIFollow[i].id === id) {
           setFollowOrNot(true);
         }
       }
     }
-    if (!followerOrFollowing) {
+    if (followOrFollowing !== '팔로워') {
       return;
     }
-  }, [followerOrFollowing, usersIFollow]);
+  }, [followOrFollowing, usersIFollow]);
   //날 팔로우 한 유저들을 내가 팔로우 했는지 여부 판단
 
   const handleBtn = () => {

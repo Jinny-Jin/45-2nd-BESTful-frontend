@@ -5,15 +5,12 @@ import { faCamera as camera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ProfileImage from '../../../../components/ProfileImage/ProfileImage';
 import fetchApi from '../../../../utils/functions';
+import { useDispatch } from 'react-redux';
 
-const ContentProfile = ({
-  myData,
-  followerNumber,
-  followingNumber,
-  handleCategory,
-}) => {
+const ContentProfile = ({ myData, followerNumber, followingNumber }) => {
   const [profileImage, setProfileImage] = useState(myData?.profileImageUrl);
   const { userName, bio } = myData;
+  const dispatch = useDispatch();
 
   const profileImageInput = useRef(null);
 
@@ -84,7 +81,12 @@ const ContentProfile = ({
         <ButtonBox>
           <FollowButton
             onClick={() => {
-              handleCategory(2, null, true);
+              dispatch({
+                type: 'CHOOSE_MYPAGE_CATEGORY',
+                myCatNumb: 2,
+                feedOrLike: null,
+              });
+              dispatch({ type: 'SWITCH', userFollowOrFollowing: '팔로워' });
             }}
           >
             <FollowNumber>{followerNumber}</FollowNumber>
@@ -92,7 +94,12 @@ const ContentProfile = ({
           </FollowButton>
           <FollowButton
             onClick={() => {
-              handleCategory(2, null, false);
+              dispatch({
+                type: 'CHOOSE_MYPAGE_CATEGORY',
+                myCatNumb: 2,
+                feedOrLike: null,
+              });
+              dispatch({ type: 'SWITCH', userFollowOrFollowing: '팔로잉' });
             }}
           >
             <FollowNumber>{followingNumber}</FollowNumber>
@@ -101,7 +108,11 @@ const ContentProfile = ({
         </ButtonBox>
         <ChangeProfile
           onClick={() => {
-            handleCategory(1, null, null);
+            dispatch({
+              type: 'CHOOSE_MYPAGE_CATEGORY',
+              myCatNumb: 1,
+              feedOrLike: null,
+            });
           }}
         >
           프로필 편집

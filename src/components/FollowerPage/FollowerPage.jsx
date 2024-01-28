@@ -1,15 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
 import FollowerList from './FollowerList/FollowerList';
+import { useSelector } from 'react-redux';
 
-const FollowerPage = ({ followerData, usersIFollow, followerOrFollowing }) => {
+const FollowerPage = ({ followerData, usersIFollow }) => {
+  const followOrFollowing = useSelector(state => state.followOrFollowing);
+
   return (
     <TopContainer>
-      <Title>{followerOrFollowing ? '팔로워' : '팔로잉'}</Title>
+      <Title>{followOrFollowing}</Title>
       <div>
         {(followerData === undefined || followerData.length === 0) && (
           <None>
-            {followerOrFollowing ? '팔로워' : '팔로잉 유저'}가 없습니다
+            {followOrFollowing === '팔로워'
+              ? '회원님을 팔로우하는 사람'
+              : '회원님이 팔로우하는사람'}
+            가 없습니다
           </None>
         )}
         {followerData !== undefined &&
@@ -19,7 +25,6 @@ const FollowerPage = ({ followerData, usersIFollow, followerOrFollowing }) => {
               key={follower.id}
               follower={follower}
               usersIFollow={usersIFollow}
-              followerOrFollowing={followerOrFollowing}
             />
           ))}
       </div>

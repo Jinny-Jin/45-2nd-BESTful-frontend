@@ -6,6 +6,7 @@ import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import fetchApi from '../../../../utils/functions';
+import { useDispatch } from 'react-redux';
 
 const modalStyle = {
   position: 'absolute',
@@ -41,10 +42,11 @@ const cancelBtn = {
   },
 };
 
-const ProfileModify = ({ myData, setMyData, handleCategory }) => {
+const ProfileModify = ({ myData, setMyData }) => {
   const [textLength, setTextLength] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const { sex, cellphone, userName, bio, email } = myData;
+  const dispatch = useDispatch();
 
   const handleModal = e => {
     setIsOpen(e);
@@ -181,7 +183,11 @@ const ProfileModify = ({ myData, setMyData, handleCategory }) => {
 
           <CancelButton
             onClick={() => {
-              handleCategory(0, true, null);
+              dispatch({
+                type: 'CHOOSE_MYPAGE_CATEGORY',
+                myCatNumb: 0,
+                feedOrLike: '피드',
+              });
             }}
           >
             취소
